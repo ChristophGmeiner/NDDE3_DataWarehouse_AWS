@@ -7,43 +7,37 @@ config.read('dwh.cfg')
 
 # DROP TABLES
 
-staging_events_table_drop = "DROP TABLE IF EXISTS \
-                             staging_events"
-staging_songs_table_drop = "DROP TABLE IF EXISTS \
-                            staging_songs"
-songplay_table_drop = "DROP TABLE IF EXISTS \
-                       songplay"
-user_table_drop = "DROP TABLE IF EXISTS \
-                   user"
-song_table_drop = "DROP TABLE IF EXISTS \
-                   song"
-artist_table_drop = "DROP TABLE IF EXISTS \
-                     artist"
-time_table_drop = "DROP TABLE IF EXISTS \
-                   time"
+staging_events_table_drop = "DROP TABLE IF EXISTS staging_events"
+staging_songs_table_drop = "DROP TABLE IF EXISTS staging_songs"
+songplay_table_drop = "DROP TABLE IF EXISTS songplay"
+user_table_drop = "DROP TABLE IF EXISTS user"
+song_table_drop = "DROP TABLE IF EXISTS song"
+artist_table_drop = "DROP TABLE IF EXISTS artist"
+time_table_drop = "DROP TABLE IF EXISTS time"
 
 # CREATE TABLES
 
-staging_events_table_create= ("""
-""")
+staging_events_table_create= ("CREATE TABLE staging_events")
 
-staging_songs_table_create = ("""
-""")
+staging_songs_table_create = ("CREATE TABLE staging_songs")
 
-songplay_table_create = ("""
-""")
+songplay_table_create = ("CREATE TABLE songplay (songplay_id serial not null, \
+                         start_time timestamp not null, user_id int not null, \
+                         level varchar, song_id varchar, artist_id varchar, \
+                         session_id int, location varchar, user_agent \
+                         varchar)")
 
-user_table_create = ("""
-""")
+user_table_create = ("CREATE TABLE user (user_id int not null, \
+                     first_name varchar, last_name varchar, gender varchar, \
+                     level varchar)")
 
-song_table_create = ("""
-""")
+song_table_create = ("CREATE TABLE song")
 
-artist_table_create = ("""
-""")
+artist_table_create = ("CREATE TABLE artist (artist_id varchar not null \
+                       primary key, name varchar, location varchar, \
+                       latitude float, longitude float)")
 
-time_table_create = ("""
-""")
+time_table_create = ("CREATE TABLE time")
 
 # STAGING TABLES
 
