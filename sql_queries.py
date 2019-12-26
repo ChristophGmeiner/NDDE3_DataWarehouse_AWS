@@ -36,7 +36,7 @@ staging_songs_table_create = ("CREATE TABLE staging_songs (num_songs int, \
                                song_id varchar, title varchar, duration float \
                                year int)")
 
-songplay_table_create = ("CREATE TABLE songplay (songplay_id serial not null, \
+songplay_table_create = ("CREATE TABLE songplay (songplay_id IDENTITY(0, 1), \
                          start_time timestamp not null, user_id int not null, \
                          level varchar, song_id varchar, artist_id varchar, \
                          session_id int, location varchar, user_agent \
@@ -70,20 +70,40 @@ staging_songs_copy = ("COPY staging_songs FROM 's3://udacity-dend/song_data' \
 
 # FINAL TABLES
 
-songplay_table_insert = ("""
-""")
+songplay_table_insert = ("INSERT INTO songplay (start_time, user_id, level, \
+                          song_id, artist_id, session_id, location, \
+                          user_agent) SELECT se.ts, u.user_id, u.level, \
+                          s.song_id, a.artist_id, se.sessionId, a.location, \
+                          se.UserAgent \
+                          from staging_events se JOIN user u ON \
+                          u.first_name = se.firstName AND \
+                          u.last_name = se.lastName \
+                          JOIN artist a ON a.name = se.artist \
+                          JOIN song s ON s.artist_id = a. artist_id AND \
+                          s.title = se.song")
 
-user_table_insert = ("""
-""")
+user_table_insert = ("INSERT INTO users (user_id, first_name, last_name, \
+                      gender, level) SELECT DISTINCT se.userId, se.firstName, \
+                      se.lastName, se.gender, se.level from staging_events se \
+                      ON CONFLICT(user_id) DO UPDATE \
+                      SET LEVEL = EXCLUDED.LEVEL")
 
-song_table_insert = ("""
-""")
+song_table_insert = ("INSERT INTO songs (song_id, title, artist_id, \
+                      year, duration) SELECT DISTINCT so.song_id, so.title, \
+                      so.artist_id, so.year, so.duration from \
+                      staging_songs so ON CONFLICT DO NOTHING")
 
-artist_table_insert = ("""
-""")
+artist_table_insert = ("INSERT INTO artists (artist_id, name, location, \
+                        latitude, longitude) SELECT DISTINCT so.artist_id, \
+                        so.artist_name, so.artist_location, \
+                        so.artist_latitude, so.artist_longitude FROM \
+                        staging_songs so ON CONFLICT DO NOTHING")
 
-time_table_insert = ("""
-""")
+time_table_insert = ("INSERT INTO time (start_time, hour, day, week, month, \
+                      year, weekday) SELECT se.ts, EXTRACT (HOUR FROM se.ts), \
+                      EXTRACT(DAY FROM se.ts), EXTRACT(WEEK FROM se.ts), \
+                      EXTRACT(MONTH FROM se.ts), EXTRACT(YEAR FROM se.ts), \
+                      EXTRACT(DOW FROM se.ts) FROM staging_events se")
 
 # QUERY LISTS
 
