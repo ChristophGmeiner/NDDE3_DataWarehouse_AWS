@@ -17,9 +17,22 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 
 # CREATE TABLES
 
-staging_events_table_create= ("CREATE TABLE staging_events")
+staging_events_table_create= ("CREATE TABLE staging_events (artist varchar, \
+                                auth varchar, firstName varchar, \
+                                gender varchar, ItemInSession int, \
+                                lastName varchar, length float, \
+                                level varchar, location varchar, \
+                                method varchar, page varchar, \
+                                registration float, sessionId int, \
+                                song varchar, status int, ts timestamp, \
+                                userAgent varchar, userId int)")
 
-staging_songs_table_create = ("CREATE TABLE staging_songs")
+staging_songs_table_create = ("CREATE TABLE staging_songs (num_songs int, \
+                               artist_id varchar, artist_latitude varchar, \
+                               artist_longtitude varchar, \
+                               artist_location varchar, artist_name varchar, \
+                               song_id varchar, title varchar, duration float \
+                               year int)")
 
 songplay_table_create = ("CREATE TABLE songplay (songplay_id serial not null, \
                          start_time timestamp not null, user_id int not null, \
@@ -31,18 +44,23 @@ user_table_create = ("CREATE TABLE user (user_id int not null, \
                      first_name varchar, last_name varchar, gender varchar, \
                      level varchar)")
 
-song_table_create = ("CREATE TABLE song")
+song_table_create = ("CREATE TABLE song song_id varchar not null, \
+                     title varchar, artist_id varchar not null, year int, \
+                     duration float)")
 
 artist_table_create = ("CREATE TABLE artist (artist_id varchar not null \
                        primary key, name varchar, location varchar, \
                        latitude float, longitude float)")
 
-time_table_create = ("CREATE TABLE time")
+time_table_create = ("CREATE TABLE time (start_time timestamp not null, \
+                     hour int, day int, week int, month int, year int, \
+                     weekday int)")
 
 # STAGING TABLES
 
-staging_events_copy = ("""
-""").format()
+staging_events_copy = ("COPY staging_events from 's3://udacity-dend/log_data'\
+                        credentials 'aws_iam_role={}' \
+                        ").format()
 
 staging_songs_copy = ("""
 """).format()
