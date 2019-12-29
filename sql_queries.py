@@ -26,14 +26,15 @@ staging_events_table_create= ("CREATE TABLE staging_events (artist varchar, \
                                 level varchar, location varchar, \
                                 method varchar, page varchar, \
                                 registration float, sessionId int, \
-                                song varchar, status int, ts timestamp, \
+                                song varchar, status int, ts varchar(50), \
                                 userAgent varchar, userId int)")
 
-staging_songs_table_create = ("CREATE TABLE staging_songs (num_songs int, \
-                               artist_id varchar, artist_latitude varchar, \
+staging_songs_table_create = ("CREATE TABLE staging_songs (artist_id varchar, \
+                               artist_latitude varchar, \
+                               artist_location varchar, \
                                artist_longtitude varchar, \
-                               artist_location varchar, artist_name varchar, \
-                               song_id varchar, title varchar, duration float \
+                               artist_name varchar, duration float, \
+                               num_songs int, song_id varchar, title varchar, \
                                year int)")
 
 songplay_table_create = ("CREATE TABLE songplay (songplay_id IDENTITY(0, 1), \
@@ -60,13 +61,16 @@ time_table_create = ("CREATE TABLE time (start_time timestamp not null, \
 
 # STAGING TABLES
 
-staging_events_copy = ("COPY staging_events FROM 's3://udacity-dend/log_data' \
-                        credentials 'aws_iam_role={}' \
-                        gzip region 'us-west_2'").format(arn)
+[LOG_DATA, LOG_JSONPATH, SONG_DATA] = config['S3'].values()
+
+staging_events_copy = ("copy {} from {} \
+                       credentials 'aws_iam_role={} \
+                       'region 'us-west-2' json {};").format('staging_events_table', 
+                                                             LOG_DATA, arn, LOG_JSONPATH)
 
 staging_songs_copy = ("COPY staging_songs FROM 's3://udacity-dend/song_data' \
                         credentials 'aws_iam_role={}' \
-                        gzip region 'us-west_2'").format(arn)
+                        gzip region 'us-west-2'").format(arn)
 
 # FINAL TABLES
 
