@@ -63,14 +63,14 @@ time_table_create = ("CREATE TABLE time (start_time timestamp not null, \
 
 [LOG_DATA, LOG_JSONPATH, SONG_DATA] = config['S3'].values()
 
-staging_events_copy = ("copy {} from {} \
+staging_events_copy = ("copy staging_events_table from {} \
                        credentials 'aws_iam_role={} \
-                       'region 'us-west-2' json {};").format('staging_events_table', 
-                                                             LOG_DATA, arn, LOG_JSONPATH)
+                       'region 'us-west-2' json {};").format(LOG_DATA, arn, 
+                       LOG_JSONPATH)
 
-staging_songs_copy = ("COPY staging_songs FROM 's3://udacity-dend/song_data' \
+staging_songs_copy = ("COPY staging_songs FROM {} \
                         credentials 'aws_iam_role={}' \
-                        gzip region 'us-west-2'").format(arn)
+                        gzip region 'us-west-2'").format(SONG_DATA, arn)
 
 # FINAL TABLES
 
