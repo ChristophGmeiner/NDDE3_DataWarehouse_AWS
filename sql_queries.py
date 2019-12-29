@@ -70,7 +70,8 @@ staging_events_copy = ("copy staging_events_table from {} \
 
 staging_songs_copy = ("COPY staging_songs FROM {} \
                         credentials 'aws_iam_role={}' \
-                        gzip region 'us-west-2'").format(SONG_DATA, arn)
+                        region 'us-west-2' \
+                        json 'auto' truncatecolumns").format(SONG_DATA, arn)
 
 # FINAL TABLES
 
