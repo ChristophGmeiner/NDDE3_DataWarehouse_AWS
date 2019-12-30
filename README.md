@@ -14,18 +14,39 @@ The sparkifydb database is postgre SQL based and is about storing information ab
 
 The analytical goal of this database to get all kings of insight into the user beahviour.
 
+Please be aware that this data is for demonstration purposes and therefore not very complete i.e. we only see some users and only data for one month, i.e. Nov. 2018.
+
 ## Description of the ETL Pipeline
 All confidential information needed for connecting to AWS is stored in a local file (not part of this repo), i.e. dwh.cfg. See the scripts for details on that.
 
-### Description of the raw Datasets
+First raw data gets imported (BULK Insert) from several json files stored in a AWS S3 bucket into two staging tables, i.e. staging_events and staging_songs.
 
-Raw data comes in json formats and is stored in several subdirectories in a AWS S3 bucket.
+After that - based on this raw data - a star schema will be implemented showing songplay behaviour as facts and users, songs, artists and time as dimensions.
 
-#### log data
-This directory contains jsons which show basically user activity per day on Sparkify.
+### Staging_events table
+This staging table is intended for the log data stored in json files and showing data about suer logs from Sparkify (i.e. what user listened to what song and when and how etc.).
+This data is located in the log_data directory in the S3 bucket.
+Since we're only interested here in events concerning the page "NextSong", I will delete all other records in the etl process.
 
-#### song data
-This directory contains jsons which show basically available songs and artists on Sparkify.
+### Staging_song table
+This staging table is intended for the song raw data. This data is also stored in json format and shows details about specific songs.
+This data is located in the song_data directory in the S3 bucket.
+
+### Songplay table
+This table is the fact table. It has an artificial primary and sort key from an identity column. Since the song dimension seems to be the biggest one, I defined the song_id here as a distkey.
+
+### Users table
+This table shows masterdata about users. I put the distribution style to ALL, since actually this is a smaller dimension table. It gets sorted by the primary key, i.e. user_id.
+
+### Song table
+This table shows masterdata about songs. I defined the song_id as primary, sort and dist key (same dist as in fact table).
+
+### Artist table
+This table shows masterdata about artists. I put the distribution style to ALL, since actually this is a smaller dimension table. It gets sorted by the primary key, i.e. artist_id.
+
+### Time table
+This table shows time and date based masterdata for each timestamp a songplay took place. I put the distribution style to ALL, since actually this is a smaller dimension table. It gets sorted by the primary key, i.e. start_time.
+
 
 ### Scripts and Files
 
@@ -44,3 +65,6 @@ This notebook shows a possible way to inspect the contents of S3 buckets.
 
 #### RunScripts.sh
 Full ETL script, drops, (Re)Creates and inserts data.
+
+#### DataChecks.ipynb
+This notebook just shows some basic data checks on the new tables (i.e. number of records, checking out a few records.)

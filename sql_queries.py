@@ -55,13 +55,14 @@ song_table_create = ("CREATE TABLE song \
                      duration float)")
 
 artist_table_create = ("CREATE TABLE artist (artist_id varchar not null \
-                       PRIMARY KEY SORTKEY DISTKEY, name varchar, \
-                       location varchar, latitude varchar, longitude varchar)")
+                       PRIMARY KEY SORTKEY, name varchar, \
+                       location varchar, latitude varchar, longitude varchar) \
+                       DISTSTYLE ALL")
 
 time_table_create = ("CREATE TABLE time (start_time timestamp NOT NULL \
-                     PRIMARY KEY SORTKEY DISTKEY, \
+                     PRIMARY KEY SORTKEY, \
                      hour int, day int, week int, month int, year int, \
-                     weekday int)")
+                     weekday int) DISTSTYLE ALL")
 
 # STAGING TABLES
 
@@ -77,18 +78,21 @@ staging_songs_copy = ("COPY staging_songs FROM {} \
                         region 'us-west-2' \
                         json 'auto' truncatecolumns").format(SONG_DATA, arn)
 
-# FINAL TABLES
+# Del not "NextSong Records"
+
+del_notnextsong = "DELETE FROM staging_events WHERE page != 'NextSong'"
+
+# Star Schema TABLES
 
 tsvar = "TIMESTAMP 'epoch' + se.ts/1000 * interval '1 second'"
 
 songplay_table_insert = ("INSERT INTO songplay (start_time, user_id, level, \
                           song_id, artist_id, session_id, location, \
-                          user_agent) SELECT {}, u.user_id, \
+                          user_agent) SELECT {}, se.userId, \
                           u.level, s.song_id, a.artist_id, se.sessionId, \
                           a.location, se.UserAgent \
                           from staging_events se JOIN users u ON \
-                          u.first_name = se.firstName AND \
-                          u.last_name = se.lastName \
+                          u.user_id = se.userId \
                           JOIN artist a ON a.name = se.artist \
                           JOIN song s ON s.artist_id = a. artist_id AND \
                           s.title = se.song").format(tsvar)
@@ -121,16 +125,18 @@ time_table_insert = ("INSERT INTO time (start_time, hour, day, week, month, \
 # QUERY LISTS
 
 create_table_queries = [staging_events_table_create, 
-                        staging_songs_table_create, songplay_table_create, 
+                        staging_songs_table_create, 
                         user_table_create, song_table_create, 
-                        artist_table_create, time_table_create]
-drop_table_queries = [staging_events_table_drop, staging_songs_table_drop, 
-                      songplay_table_drop, user_table_drop, song_table_drop, 
-                      artist_table_drop, time_table_drop]
+                        artist_table_create, time_table_create,
+                        songplay_table_create]
+drop_table_queries = [staging_events_table_drop, staging_songs_table_drop,
+                      user_table_drop, song_table_drop, 
+                      artist_table_drop, time_table_drop, 
+                      songplay_table_drop]
 copy_table_queries = [staging_events_copy, staging_songs_copy]
 ctabs = ["staging_events", "staging_songs"]
-insert_table_queries = [songplay_table_insert, user_table_insert, 
+insert_table_queries = [user_table_insert, 
                         song_table_insert, artist_table_insert, 
-                        time_table_insert]
-tables = ["songplay", "user", "song", "artist", "time"]
+                        time_table_insert, songplay_table_insert]
+tables = ["user", "song", "artist", "time", "songplay"]
 drcrtabs = ctabs + tables
