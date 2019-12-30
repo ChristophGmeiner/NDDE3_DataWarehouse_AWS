@@ -1,17 +1,19 @@
 import configparser
 import psycopg2
-from sql_queries import copy_table_queries, insert_table_queries
+from sql_queries import copy_table_queries, insert_table_queries, tables, ctabs
 
 
 def load_staging_tables(cur, conn):
-    for query in copy_table_queries:
+    for ctab, query in zip(ctabs, copy_table_queries):
         cur.execute(query)
+        print("Copy for: {} finished!".format(ctab))
         conn.commit()
 
 
 def insert_tables(cur, conn):
-    for query in insert_table_queries:
+    for tab, query in zip(tables, insert_table_queries):
         cur.execute(query)
+        print("Insert for: {} finished!".format(tab))
         conn.commit()
 
 

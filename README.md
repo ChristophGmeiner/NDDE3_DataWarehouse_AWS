@@ -34,9 +34,13 @@ This Python script contains all necessary SQL scripts to extract the data from t
 Also all necessary tables are created in there. This commands of this script are used in later scripts.
 
 #### create_tables.py
-Creates all necessary tables in AWS Redshift (based on sql_queries.py)
+Drop and (Re-)Creates all necessary tables in AWS Redshift (based on sql_queries.py)
 
 #### etl.py
+Inserts json data from a AWS S3 bucket into the newly created tables.
 
 #### s3_inspect.ipynb
 This notebook shows a possible way to inspect the contents of S3 buckets.
+
+#### RunScripts.sh
+Full ETL script, drops, (Re)Creates and inserts data.

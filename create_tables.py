@@ -1,17 +1,19 @@
 import configparser
 import psycopg2
-from sql_queries import create_table_queries, drop_table_queries
+from sql_queries import create_table_queries, drop_table_queries, drcrtabs
 
 
 def drop_tables(cur, conn):
-    for query in drop_table_queries:
+    for drtab, query in zip(drcrtabs, drop_table_queries):
         cur.execute(query)
+        print("{} dropped!".format(drtab))
         conn.commit()
 
 
 def create_tables(cur, conn):
-    for query in create_table_queries:
+    for crtab, query in zip(drcrtabs, create_table_queries):
         cur.execute(query)
+        print("{} created!".format(crtab))
         conn.commit()
 
 

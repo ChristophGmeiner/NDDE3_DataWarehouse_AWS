@@ -1,3 +1,4 @@
 dwh.cfg
 .ipynb*
 Redshift*ipynb
+*pycache*
