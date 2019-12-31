@@ -40,9 +40,9 @@ staging_songs_table_create = ("CREATE TABLE staging_songs (artist_id varchar, \
 songplay_table_create = ("CREATE TABLE songplay \
                          (songplay_id int IDENTITY(0, 1) PRIMARY KEY SORTKEY, \
                          start_time timestamp not null, user_id int not null, \
-                         level varchar, song_id varchar DISTKEY, \
-                         artist_id varchar, session_id int, location varchar, \
-                         user_agent varchar)")
+                         level varchar, song_id varchar not null DISTKEY, \
+                         artist_id varchar not null, session_id int, \
+                         location varchar, user_agent varchar)")
 
 user_table_create = ("CREATE TABLE users \
                      (user_id int not null PRIMARY KEY SORTKEY, \
@@ -94,7 +94,7 @@ songplay_table_insert = ("INSERT INTO songplay (start_time, user_id, level, \
                           from staging_events se JOIN users u ON \
                           u.user_id = se.userId \
                           JOIN artist a ON a.name = se.artist \
-                          JOIN song s ON s.artist_id = a. artist_id AND \
+                          JOIN song s ON s.artist_id = a.artist_id AND \
                           s.title = se.song").format(tsvar)
 
 user_table_insert = ("INSERT INTO users (user_id, first_name, last_name, \
@@ -114,13 +114,12 @@ artist_table_insert = ("INSERT INTO artist (artist_id, name, location, \
                         staging_songs so WHERE so.artist_id IS NOT NULL")
 
 time_table_insert = ("INSERT INTO time (start_time, hour, day, week, month, \
-                      year, weekday) SELECT {}, \
-                      EXTRACT (HOUR FROM {}), \
-                      EXTRACT(DAY FROM {}), EXTRACT(WEEK FROM {}), \
-                      EXTRACT(MONTH FROM {}), EXTRACT(YEAR FROM {}), \
-                      EXTRACT(DOW FROM {}) \
-                      FROM staging_events se").format(tsvar, tsvar, tsvar, 
-                      tsvar, tsvar, tsvar, tsvar)
+                      year, weekday) SELECT {0}, \
+                      EXTRACT (HOUR FROM {0}), \
+                      EXTRACT(DAY FROM {0}), EXTRACT(WEEK FROM {0}), \
+                      EXTRACT(MONTH FROM {0}), EXTRACT(YEAR FROM {0}), \
+                      EXTRACT(DOW FROM {0}) \
+                      FROM staging_events se").format(tsvar)
 
 # QUERY LISTS
 
